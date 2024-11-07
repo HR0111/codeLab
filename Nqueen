@@ -7,8 +7,9 @@ using namespace std;
 class Solution {
 public:
     bool isSafe(vector<string> &board, int row, int col) {
-        // Check for left
         int i = row, j = col;
+        
+        // Check for left
         while (j >= 0) {
             if (board[i][j] == 'Q')
                 return false;
@@ -35,26 +36,40 @@ public:
         return true;
     }
 
-    void solve(vector<string> &board, int col, int n, vector<vector<string>> &ans) {
+    bool solve(vector<string> &board, int col, int n) {
         if (col == n) {
-            ans.push_back(board);
-            return;
+            return true; // Solution found
         }
 
         for (int row = 0; row < n; row++) {
             if (isSafe(board, row, col)) {
                 board[row][col] = 'Q';
-                solve(board, col + 1, n, ans);
-                board[row][col] = '.';
+                if (solve(board, col + 1, n)) {
+                    return true; // Stop after finding the first solution
+                }
+                board[row][col] = '.'; // Backtrack
             }
         }
+        return false;
     }
 
-    vector<vector<string>> solveNQueens(int n) {
+    vector<string> generateNQueensMatrix(int n) {
+        if (n == 2 || n == 3) {
+            // No solution exists for n = 2 or n = 3
+            return {};
+        }
+        
         vector<string> board(n, string(n, '.'));
-        vector<vector<string>> ans;
-        solve(board, 0, n, ans);
-        return ans;
+
+        // Place the first Queen at a specific starting position, e.g., (0, 0)
+        board[0][0] = 'Q';
+
+        // Use backtracking to place the remaining queens
+        if (!solve(board, 1, n)) {
+            return {}; // Return empty if no solution is found
+        }
+
+        return board;
     }
 };
 
@@ -63,15 +78,24 @@ int main() {
     cout << "Enter the value of n for the N-Queens problem: ";
     cin >> n;
 
-    Solution solution;
-    vector<vector<string>> result = solution.solveNQueens(n);
+    if (n < 1) {
+        cout << "Invalid input. n must be greater than or equal to 1." << endl;
+        return 0;
+    }
 
-    cout << "Number of solutions: " << result.size() << endl;
-    for (int i = 0; i < result.size(); i++) {
-        for (int j = 0; j < result[i].size(); j++) {
-            cout << result[i][j] << endl;
+    Solution solution;
+    vector<string> result = solution.generateNQueensMatrix(n);
+
+    if (result.empty()) {
+        cout << "No solution exists for the " << n << "-Queens problem." << endl;
+    } else {
+        cout << "One possible solution for the " << n << "-Queens matrix is:" << endl;
+        for (const string &row : result) {
+            cout << row << endl;
         }
-        cout << endl;
+        // for(char i = 0 ; i < result.size() ; i++){
+        //         cout<<result[i];
+        // }
     }
 
     return 0;
