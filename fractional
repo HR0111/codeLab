@@ -1,0 +1,74 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// Define a structure for items in the knapsack
+struct Item {
+    double value;
+    double weight;
+
+    // Calculate value-to-weight ratio
+    double ratio() const {
+        return value / weight;
+    }
+};
+
+// Comparison function to sort items by ratio (value/weight) in descending order
+bool compare(Item a, Item b) {
+    return a.ratio() > b.ratio();
+}
+
+// Function to calculate maximum value for the fractional knapsack
+double fractionalKnapsack(vector<Item>& items, double capacity) {
+    // Sort items by value-to-weight ratio
+    sort(items.begin(), items.end(), compare);
+
+    double totalValue = 0.0;  // To store the total value in knapsack
+
+    for (const Item& item : items) {
+        // If adding the item doesn't exceed capacity, add it completely
+        if (capacity >= item.weight) {
+            capacity -= item.weight;
+            totalValue += item.value;
+        } else { // Otherwise, take the fraction that fits
+            totalValue += item.value * (capacity / item.weight);
+            break; // Knapsack is full
+        }
+    }
+    return totalValue;
+}
+
+int main() {
+    int n;
+    double capacity;
+
+    // User input for number of items and capacity
+    cout << "Enter the number of items: ";
+    cin >> n;
+    cout << "Enter the capacity of the knapsack: ";
+    cin >> capacity;
+
+    vector<Item> items(n);
+
+    // User input for each item's value and weight
+    for (int i = 0; i < n; i++) {
+        cout << "Enter value and weight for item " << i + 1 << ": ";
+        cin >> items[i].value >> items[i].weight;
+    }
+
+    // Calculate maximum value and display the result
+    double maxValue = fractionalKnapsack(items, capacity);
+    cout << "Maximum value in the knapsack: " << maxValue << endl;
+
+    return 0;
+}
+
+
+// Enter the number of items: 3
+// Enter the capacity of the knapsack: 50
+// Enter value and weight for item 1: 60 10
+// Enter value and weight for item 2: 100 20
+// Enter value and weight for item 3: 120 30
+
+// Maximum value in the knapsack: 240
